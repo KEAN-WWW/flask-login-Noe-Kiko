@@ -1,5 +1,4 @@
 """Testing Registration Routes"""
-from flask import url_for
 import pytest
 
 from application.database import User
@@ -11,8 +10,7 @@ def create_app():
     new_app = init_app()
     new_app.config.update({
         "TESTING": True,
-        "WTF_CSRF_ENABLED": False,
-        "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:"
+        "WTF_CSRF_ENABLED": False
     })
 
     with new_app.app_context():
@@ -37,7 +35,7 @@ def test_user_invalid_login(client):
         "password": "123456",
     }, follow_redirects=True)
 
-    assert response.request.path == url_for('authentication.login')
+    assert response.request.path == "/login"
     assert response.status_code == 200
     assert b"User Not Found" in response.data
 
@@ -46,15 +44,15 @@ def test_user_login(client, app):
     """test valid login"""
     with app.app_context():
         user = User.create('steve@123.com', '123456')
-        db.session.add(user)
-        db.session.commit()
+        db.session.add(user)  # pylint: disable=no-member
+        db.session.commit()  # pylint: disable=no-member
 
     response = client.post("/login", data={
         "email": "steve@123.com",
         "password": "123456",
     }, follow_redirects=True)
 
-    assert response.request.path == url_for('authentication.dashboard')
+    assert response.request.path == "/dashboard"
     assert response.status_code == 200
 
 
@@ -62,15 +60,15 @@ def test_user_invalid_passwd(client, app):
     """test invalid passwd"""
     with app.app_context():
         user = User.create('steve@123.com', '123456')
-        db.session.add(user)
-        db.session.commit()
+        db.session.add(user)  # pylint: disable=no-member
+        db.session.commit()  # pylint: disable=no-member
 
     response = client.post("/login", data={
         "email": "steve@123.com",
         "password": "2345",
     }, follow_redirects=True)
 
-    assert response.request.path == url_for('authentication.login')
+    assert response.request.path == "/login"
     assert response.status_code == 200
     assert b"Password Incorrect" in response.data
 
@@ -79,23 +77,23 @@ def test_user_logout(client, app):
     """test login then logout"""
     with app.app_context():
         user = User.create('steve@123.com', '123456')
-        db.session.add(user)
-        db.session.commit()
+        db.session.add(user)  # pylint: disable=no-member
+        db.session.commit()  # pylint: disable=no-member
 
     response = client.post("/login", data={
         "email": "steve@123.com",
         "password": "123456",
     }, follow_redirects=True)
-    assert response.request.path == url_for('authentication.dashboard')
+    assert response.request.path == "/dashboard"
     assert response.status_code == 200
 
     response = client.get("/logout", follow_redirects=True)
-    assert response.request.path == url_for('homepage.homepage')
+    assert response.request.path == "/"
     assert response.status_code == 200
 
 
 def test_user_access_no_credential(client):
     """test access without credential"""
     response = client.get("/dashboard", follow_redirects=True)
-    assert response.request.path == url_for('authentication.login')
+    assert response.request.path == "/login"
     assert response.status_code == 200
