@@ -41,7 +41,7 @@ def login():
             flash('User Not Found', 'error')
             return render_template('login.html', form=form)
         
-        if not check_password_hash(user.password, form.password.data):
+        if not user.check_password(form.password.data):
             flash('Password Incorrect', 'error')
             return render_template('login.html', form=form)
         
