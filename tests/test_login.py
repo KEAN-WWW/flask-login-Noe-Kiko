@@ -38,6 +38,7 @@ def test_user_invalid_login(client):
     assert response.request.path == "/login"
     assert response.status_code == 200
     assert b"User Not Found" in response.data
+    assert b"Login" in response.data
 
 
 def test_user_login(client, app):
@@ -54,6 +55,8 @@ def test_user_login(client, app):
 
     assert response.request.path == "/dashboard"
     assert response.status_code == 200
+    assert b"Welcome" in response.data
+    assert b"Your user ID is" in response.data
 
 
 def test_user_invalid_passwd(client, app):
@@ -71,6 +74,7 @@ def test_user_invalid_passwd(client, app):
     assert response.request.path == "/login"
     assert response.status_code == 200
     assert b"Password Incorrect" in response.data
+    assert b"Login" in response.data
 
 
 def test_user_logout(client, app):
@@ -86,10 +90,14 @@ def test_user_logout(client, app):
     }, follow_redirects=True)
     assert response.request.path == "/dashboard"
     assert response.status_code == 200
+    assert b"Welcome" in response.data
+    assert b"Your user ID is" in response.data
 
     response = client.get("/logout", follow_redirects=True)
     assert response.request.path == "/"
     assert response.status_code == 200
+    assert b"Login" in response.data
+    assert b"Register" in response.data
 
 
 def test_user_access_no_credential(client):
@@ -97,3 +105,5 @@ def test_user_access_no_credential(client):
     response = client.get("/dashboard", follow_redirects=True)
     assert response.request.path == "/login"
     assert response.status_code == 200
+    assert b"Login" in response.data
+    assert b"Register" in response.data
