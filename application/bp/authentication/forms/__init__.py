@@ -4,9 +4,13 @@ from wtforms.fields import *
 
 
 class LoginForm(FlaskForm):
-    pass
+    email = StringField('Email', validators=[validators.DataRequired(), validators.Email()])
+    password = PasswordField('Password', validators=[validators.DataRequired()])
+    submit = SubmitField('Login')
 
 class RegisterForm(FlaskForm):
-    pass
+    email = StringField('Email', validators=[validators.DataRequired(), validators.Email()])
+    password = PasswordField('Password', validators=[validators.DataRequired()])
+    submit = SubmitField('Register')
 
 
