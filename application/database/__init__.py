@@ -11,8 +11,9 @@ db = SQLAlchemy()
 class User(db.Model, UserMixin):
     """User Model"""
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(128))
-    password = db.Column(db.String(128))
+    email = db.Column(db.String(128), unique=True, nullable=False)
+    password = db.Column(db.String(128), nullable=False)
+    active = db.Column(db.Boolean, default=True)
 
     def __init__(self, email, password, active=True):
         self.email = email
@@ -50,9 +51,11 @@ class User(db.Model, UserMixin):
     def set_password(password):
         return generate_password_hash(password)
 
+    def get_id(self):
+        return str(self.id)
 
     def is_authenticated(self):
-        return self.authenticated
+        return True
 
-    # def get_id(self):
-    #     return self.id
+    def is_active(self):
+        return self.active
